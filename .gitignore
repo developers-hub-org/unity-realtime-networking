@@ -2,6 +2,17 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
+
+# Ignore everything except Assets/Packages/DevelopersHub/RealtimeNetworking
+/*
+!/Assets/
+/Assets/*
+!/Assets/Packages/
+/Assets/Packages/*
+!/Assets/Packages/DevelopersHub/
+/Assets/Packages/DevelopersHub/*
+!/Assets/Packages/DevelopersHub/RealtimeNetworking/
+
 .utmp/
 /[Ll]ibrary/
 /[Tt]emp/
