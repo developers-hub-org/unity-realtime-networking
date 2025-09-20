@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.IO;
-using System.Numerics;
 using System.Text;
 using System.Linq;
+using UnityEngine;
 
 namespace DevelopersHub.RealtimeNetworking
 {
@@ -185,33 +185,19 @@ namespace DevelopersHub.RealtimeNetworking
         /// <param name="value">The Vector3 to add.</param>
         public void Write(Vector3 value)
         {
-            Write(value.X);
-            Write(value.Y);
-            Write(value.Z);
-        }
-
-        /// <summary>Adds a Vector3 to the packet.</summary>
-        /// <param name="value">The Vector3 to add.</param>
-        public void Write(UnityEngine.Vector3 value)
-        {
-            Write(new System.Numerics.Vector3(value.x, value.y, value.z));
-        }
-
-        /// <summary>Adds a Vector3 to the packet.</summary>
-        /// <param name="value">The Vector3 to add.</param>
-        public void Write(UnityEngine.Quaternion value)
-        {
-            Write(new System.Numerics.Quaternion(value.x, value.y, value.z, value.w));
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
         }
 
         /// <summary>Adds a Quaternion to the packet.</summary>
         /// <param name="value">The Quaternion to add.</param>
         public void Write(Quaternion value)
         {
-            Write(value.X);
-            Write(value.Y);
-            Write(value.Z);
-            Write(value.W);
+            Write(value.x);
+            Write(value.y);
+            Write(value.z);
+            Write(value.w);
         }
 
         #endregion
