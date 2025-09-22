@@ -331,8 +331,8 @@ namespace DevelopersHub.RealtimeNetworking
                 // Send connection token to client
                 using (Packet packet = new Packet())
                 {
-                    packet.Write(1); // Connection accepted
-                    packet.Write(clientData.sendToken);
+                    packet.WriteInt(1); // Connection accepted
+                    packet.WriteString(clientData.sendToken);
                     SendPacketInternal(clientId, packet, ConnectionProtocol.TCP);
                 }
 

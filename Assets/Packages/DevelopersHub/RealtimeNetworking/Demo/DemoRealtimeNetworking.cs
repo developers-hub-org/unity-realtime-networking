@@ -114,8 +114,8 @@ public class DemoRealtimeNetworking : MonoBehaviour
             {
                 using(Packet packet = new Packet())
                 {
-                    packet.Write((int)PacketID.HelloWorld);
-                    packet.Write("Hello World");
+                    packet.WriteInt((int)PacketID.HelloWorld);
+                    packet.WriteString("Hello World");
                     server.SendPacketToAllClients(packet, Server.ConnectionProtocol.UDP);
                 }
             }
@@ -145,8 +145,8 @@ public class DemoRealtimeNetworking : MonoBehaviour
             {
                 using (Packet packet = new Packet())
                 {
-                    packet.Write((int)PacketID.HelloWorld);
-                    packet.Write("Hello World");
+                    packet.WriteInt((int)PacketID.HelloWorld);
+                    packet.WriteString("Hello World");
                     client.SendPacket(packet, Server.ConnectionProtocol.UDP);
                 }
             }

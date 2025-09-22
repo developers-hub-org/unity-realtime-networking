@@ -43,7 +43,7 @@ namespace DevelopersHub.RealtimeNetworking
         {
             buffer = new List<byte>(); // Initialize buffer
             readPos = 0; // Set readPos to 0
-            Write(id); // Write packet id to the buffer
+            WriteInt(id); // Write packet id to the buffer
         }
 
         /// <summary>Creates a packet from which data can be read. Used for receiving.</summary>
@@ -61,7 +61,7 @@ namespace DevelopersHub.RealtimeNetworking
         /// <param name="data">The bytes to add to the packet.</param>
         public void SetBytes(byte[] data)
         {
-            Write(data);
+            WriteBytes(data);
             readableBuffer = buffer.ToArray();
         }
 
@@ -119,85 +119,85 @@ namespace DevelopersHub.RealtimeNetworking
 
         /// <summary>Adds a byte to the packet.</summary>
         /// <param name="value">The byte to add.</param>
-        public void Write(byte value)
+        public void WriteByte(byte value)
         {
             buffer.Add(value);
         }
 
         /// <summary>Adds an array of bytes to the packet.</summary>
         /// <param name="value">The byte array to add.</param>
-        public void Write(byte[] value)
+        public void WriteBytes(byte[] value)
         {
             buffer.AddRange(value);
         }
 
         /// <summary>Adds a short to the packet.</summary>
         /// <param name="value">The short to add.</param>
-        public void Write(short value)
+        public void WriteShort(short value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds an int to the packet.</summary>
         /// <param name="value">The int to add.</param>
-        public void Write(int value)
+        public void WriteInt(int value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds a long to the packet.</summary>
         /// <param name="value">The long to add.</param>
-        public void Write(long value)
+        public void WriteLong(long value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds a float to the packet.</summary>
         /// <param name="value">The float to add.</param>
-        public void Write(float value)
+        public void WriteFloat(float value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds a double to the packet.</summary>
         /// <param name="value">The double to add.</param>
-        public void Write(double value)
+        public void WriteDouble(double value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds a bool to the packet.</summary>
         /// <param name="value">The bool to add.</param>
-        public void Write(bool value)
+        public void WriteBool(bool value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
         /// <summary>Adds a string to the packet.</summary>
         /// <param name="value">The string to add.</param>
-        public void Write(string value)
+        public void WriteString(string value)
         {
-            Write(value.Length); // Add the length of the string to the packet
+            WriteInt(value.Length); // Add the length of the string to the packet
             buffer.AddRange(Encoding.ASCII.GetBytes(value)); // Add the string itself
         }
 
         /// <summary>Adds a Vector3 to the packet.</summary>
         /// <param name="value">The Vector3 to add.</param>
-        public void Write(Vector3 value)
+        public void WriteVector3(Vector3 value)
         {
-            Write(value.x);
-            Write(value.y);
-            Write(value.z);
+            WriteFloat(value.x);
+            WriteFloat(value.y);
+            WriteFloat(value.z);
         }
 
         /// <summary>Adds a Quaternion to the packet.</summary>
         /// <param name="value">The Quaternion to add.</param>
-        public void Write(Quaternion value)
+        public void WriteQuaternion(Quaternion value)
         {
-            Write(value.x);
-            Write(value.y);
-            Write(value.z);
-            Write(value.w);
+            WriteFloat(value.x);
+            WriteFloat(value.y);
+            WriteFloat(value.z);
+            WriteFloat(value.w);
         }
 
         #endregion

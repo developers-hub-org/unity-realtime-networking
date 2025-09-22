@@ -213,8 +213,8 @@ namespace DevelopersHub.RealtimeNetworking
                         _sendToken = Guid.NewGuid().ToString();
                         using (Packet response = new Packet())
                         {
-                            response.Write((int)1);
-                            response.Write(_sendToken);
+                            response.WriteInt((int)1);
+                            response.WriteString(_sendToken);
                             SendPacketInternal(response, Server.ConnectionProtocol.TCP);
                         }
                         OnConnectionAttempt.Invoke(this, true, null);
