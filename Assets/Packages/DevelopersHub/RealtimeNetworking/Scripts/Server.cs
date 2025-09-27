@@ -182,7 +182,11 @@ namespace DevelopersHub.RealtimeNetworking
         {
             foreach (var clientId in _tcpClients.Keys)
             {
-                SendPacket(clientId, packet, Packet.ID.CUSTOM, protocol);
+                using(Packet clone = new Packet(packet.ToArray()))
+                {
+                    clone.compress = packet.compress;
+                    SendPacket(clientId, clone, Packet.ID.CUSTOM, protocol);
+                }
             }
         }
 
