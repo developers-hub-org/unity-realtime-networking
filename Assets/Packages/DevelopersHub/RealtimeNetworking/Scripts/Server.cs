@@ -180,13 +180,20 @@ namespace DevelopersHub.RealtimeNetworking
 
         public void SendPacketToAllClients(Packet packet, ConnectionProtocol protocol)
         {
-            foreach (var clientId in _tcpClients.Keys)
+            try
             {
-                using(Packet clone = new Packet(packet.ToArray()))
+                packet.SetID((int)Packet.ID.CUSTOM);
+                packet.InternalSendInitialize();
+                packet.WriteLength();
+                var data = packet.ToArray();
+                foreach (var clientId in _tcpClients.Keys)
                 {
-                    clone.compress = packet.compress;
-                    SendPacket(clientId, clone, Packet.ID.CUSTOM, protocol);
+                    SendPacket(clientId, data, protocol);
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Error while sending data to all clients:\n{e.Message}");
             }
         }
 
@@ -227,6 +234,45 @@ namespace DevelopersHub.RealtimeNetworking
                         packet.InternalSendInitialize();
                         packet.WriteLength();
                         _udpListener.BeginSend(packet.ToArray(), packet.Length(), clientData.endPoint, null, null);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("UDP is not initialized. Client should send a UDP message to server to be registered.");
+                    }
+                }
+                catch (Exception e)
+                {
+                    DisconnectClient(clientId, $"Send UDP data error:\n{e.Message}");
+                }
+            }
+        }
+
+        private void SendPacket(int clientId, byte[] data, ConnectionProtocol protocol)
+        {
+            if (!_running)
+            {
+                Debug.Log("Server is not running.");
+                return;
+            }
+            if (!_tcpClients.TryGetValue(clientId, out ClientData client)) { return; }
+            if (protocol == Server.ConnectionProtocol.TCP)
+            {
+                try
+                {
+                    client.stream.BeginWrite(data, 0, data.Length, null, null);
+                }
+                catch (Exception e)
+                {
+                    DisconnectClient(clientId, $"Send TCP data error:\n{e.Message}");
+                }
+            }
+            else if (protocol == Server.ConnectionProtocol.UDP)
+            {
+                try
+                {
+                    if (client.endPoint != null)
+                    {
+                        _udpListener.BeginSend(data, data.Length, client.endPoint, null, null);
                     }
                     else
                     {
