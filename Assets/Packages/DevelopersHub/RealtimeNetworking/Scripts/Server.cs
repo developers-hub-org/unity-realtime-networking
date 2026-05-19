@@ -52,17 +52,20 @@ namespace DevelopersHub.RealtimeNetworking
 
         #endregion
 
-        #region Server Variables
+        #region Variables
         private ushort _port = 0; public ushort Port { get { return _port; } }
         private bool _running = false; public bool IsRunning { get { return _running; } }
         private TcpListener _tcpListener = null;
         private UdpClient _udpListener = null;
         private readonly Dictionary<int, ClientData> _tcpClients = new Dictionary<int, ClientData>();
         private readonly SortedSet<int> _availableIds = new SortedSet<int>();
+        private readonly Queue<ReleasedID> _releasedIdsQueue = new Queue<ReleasedID>();
         private readonly Dictionary<IPAddress, int> _ipToClientId = new Dictionary<IPAddress, int>();
         private int _maxId = 0;
         private static int _dataBufferSize = 4096;
         private bool _initialized = false;
+        private float _cleanupTimer = 0;
+        private const int ID_COOLDOWN_SECONDS = 60;
         #endregion
 
         #region Events
@@ -94,6 +97,20 @@ namespace DevelopersHub.RealtimeNetworking
             _initialized = true;
             DontDestroyOnLoad(gameObject);
             Application.runInBackground = true;
+        }
+
+        private void Update()
+        {
+            if (!_initialized || !_running) { return; }
+            if(_cleanupTimer < 10f) // Every 10 seconds
+            {
+                _cleanupTimer += Time.deltaTime;
+            }
+            else
+            {
+                _cleanupTimer = 0;
+                CleanupExpiredIDs();
+            }
         }
 
         public static Server CreateNewServer()
@@ -174,6 +191,7 @@ namespace DevelopersHub.RealtimeNetworking
             _tcpClients.Clear();
             _udpListener?.Close();
             _availableIds.Clear();
+            _releasedIdsQueue.Clear();
             _maxId = 0;
         }
 
@@ -328,10 +346,23 @@ namespace DevelopersHub.RealtimeNetworking
 
         #region ID Management Methods
 
+        private class ReleasedID
+        {
+            public int id;
+            public DateTime releaseTime;
+            public ReleasedID(int id, DateTime releaseTime)
+            {
+                this.id = id;
+                this.releaseTime = releaseTime;
+            }
+        }
+
         private int GetNextAvailableID()
         {
             lock (_availableIds)
             {
+                CleanupExpiredIDs();
+
                 // If we have available IDs, return the smallest one
                 if (_availableIds.Count > 0)
                 {
@@ -349,8 +380,8 @@ namespace DevelopersHub.RealtimeNetworking
         {
             lock (_availableIds)
             {
-                // Add the ID back to the available pool
-                _availableIds.Add(id);
+                // Instead of immediately making the ID available, add it to the cooldown queue
+                _releasedIdsQueue.Enqueue(new ReleasedID(id, DateTime.UtcNow));
 
                 // If this was the highest ID and we have available IDs, we can try to optimize our max ID counter
                 if (id == _maxId && _availableIds.Count > 0)
@@ -367,6 +398,34 @@ namespace DevelopersHub.RealtimeNetworking
                 {
                     // If no available IDs, decrement the max counter
                     _maxId--;
+                }
+            }
+        }
+
+        private void CleanupExpiredIDs()
+        {
+            if (_releasedIdsQueue.Count <= 0) { return; }
+            lock (_availableIds)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                // Process all expired IDs from the queue
+                while (_releasedIdsQueue.Count > 0)
+                {
+                    ReleasedID releasedID = _releasedIdsQueue.Peek();
+                    TimeSpan elapsed = now - releasedID.releaseTime;
+
+                    if (elapsed.TotalSeconds >= ID_COOLDOWN_SECONDS)
+                    {
+                        // ID has expired, move it to available pool
+                        _releasedIdsQueue.Dequeue();
+                        _availableIds.Add(releasedID.id);
+                    }
+                    else
+                    {
+                        // Queue is ordered by release time, so if this one isn't expired, none after it will be
+                        break;
+                    }
                 }
             }
         }
