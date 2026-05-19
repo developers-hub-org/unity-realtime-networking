@@ -16,7 +16,7 @@ namespace DevelopersHub.RealtimeNetworking
             TCP, UDP
         }
 
-        private class ClientData
+        public class ClientData
         {
             public TcpClient client;
             public NetworkStream stream;
@@ -26,6 +26,9 @@ namespace DevelopersHub.RealtimeNetworking
             public string receiveToken;
             public int id;
             public IPEndPoint endPoint;
+            public string ip;
+            public long accountId;
+            public string token;
 
             public ClientData(int clientId, TcpClient tcpClient)
             {
@@ -36,6 +39,7 @@ namespace DevelopersHub.RealtimeNetworking
                 receivedData = new Packet();
                 sendToken = Guid.NewGuid().ToString();
                 receiveToken = null;
+                ip = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
             }
 
             public void Dispose()
@@ -284,6 +288,18 @@ namespace DevelopersHub.RealtimeNetworking
                     DisconnectClient(clientId, $"Send UDP data error:\n{e.Message}");
                 }
             }
+        }
+
+        public string GetClientIP(int clientId)
+        {
+            if (_tcpClients.TryGetValue(clientId, out ClientData clientData)) { return clientData.ip; }
+            return "";
+        }
+
+        public ClientData GetClient(int clientId)
+        {
+            if (_tcpClients.TryGetValue(clientId, out ClientData clientData)) { return clientData; }
+            return null;
         }
 
         public static Server Get(ushort port)
