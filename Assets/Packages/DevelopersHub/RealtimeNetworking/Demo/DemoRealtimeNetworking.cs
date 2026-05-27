@@ -167,7 +167,7 @@ public class DemoRealtimeNetworking : MonoBehaviour
     {
         if (connected)
         {
-            CreateClientItem(client.IP, client.Port);
+            CreateClientItem(client.serverIP, client.Port);
         }
         else
         {
@@ -183,7 +183,7 @@ public class DemoRealtimeNetworking : MonoBehaviour
             var ipText = _clientItemsContainer.GetChild(i).transform.Find("TextIP").GetComponent<TextMeshProUGUI>();
             string ip = ipText.text.Split(':')[1].Trim();
             ushort port = ushort.Parse(ipText.text.Split(':')[2].Trim());
-            if (ip == client.IP && port == client.Port)
+            if (ip == client.serverIP && port == client.Port)
             {
                 Destroy(_clientItemsContainer.GetChild(i).gameObject);
                 break;
@@ -198,7 +198,7 @@ public class DemoRealtimeNetworking : MonoBehaviour
         {
             case PacketID.HelloWorld:
                 var message = packet.ReadString();
-                Log($"Client: Received from server {client.IP}:{client.Port}: {message}", Color.yellow);
+                Log($"Client: Received from server {client.serverIP}:{client.Port}: {message}", Color.yellow);
                 break;
         }
     }

@@ -10,7 +10,7 @@ namespace DevelopersHub.RealtimeNetworking
     {
 
         #region Variables
-        private string _ip = ""; public string IP { get { return _ip; } }
+        private string _serverIP = ""; public string serverIP { get { return _serverIP; } }
         private ushort _port = 0; public ushort Port { get { return _port; } }
         private bool _connecting = false; public bool IsConnecting { get { return _connecting; } }
         private bool _connected = false; public bool IsConnected { get { return _connected; } }
@@ -139,7 +139,7 @@ namespace DevelopersHub.RealtimeNetworking
                 for (int i = 0; i < clients.Length; i++)
                 {
                     var client = clients[i];
-                    if ((client._connected || client._connecting) && client._ip == ip && client._port == port)
+                    if ((client._connected || client._connecting) && client._serverIP == ip && client._port == port)
                     {
                         return client;
                     }
@@ -182,7 +182,7 @@ namespace DevelopersHub.RealtimeNetworking
             bool waiting = false;
             try
             {
-                _ip = ip;
+                _serverIP = ip;
                 _port = port;
                 result = _tcpSocket.BeginConnect(ip, port, TcpConnectionAttemptCallback, _tcpSocket);
                 waiting = result.AsyncWaitHandle.WaitOne(_connectTimeout, false);
@@ -344,7 +344,7 @@ namespace DevelopersHub.RealtimeNetworking
 
             try
             {
-                _udpEndPoint = new IPEndPoint(IPAddress.Parse(_ip), _port);
+                _udpEndPoint = new IPEndPoint(IPAddress.Parse(_serverIP), _port);
                 _udpSocket = new UdpClient(port);
                 _udpSocket.Connect(_udpEndPoint);
                 _udpSocket.BeginReceive(UdpReceiveCallback, null);
