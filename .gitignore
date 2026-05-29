@@ -3,16 +3,6 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 
-# Ignore everything except Assets/Packages/DevelopersHub/RealtimeNetworking
-/*
-!/Assets/
-/Assets/*
-!/Assets/Packages/
-/Assets/Packages/*
-!/Assets/Packages/DevelopersHub/
-/Assets/Packages/DevelopersHub/*
-!/Assets/Packages/DevelopersHub/RealtimeNetworking/
-
 .utmp/
 /[Ll]ibrary/
 /[Tt]emp/
@@ -21,6 +11,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+/[Pp]ackages/
 *.log
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.
