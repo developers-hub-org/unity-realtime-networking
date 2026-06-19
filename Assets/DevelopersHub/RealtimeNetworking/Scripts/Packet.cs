@@ -11,6 +11,7 @@ namespace DevelopersHub.RealtimeNetworking
     public class Packet : IDisposable
     {
 
+        #region Core
         public enum ID
         {
             INTERNAL = 0, CUSTOM = 1
@@ -54,6 +55,7 @@ namespace DevelopersHub.RealtimeNetworking
             readPos = 0; // Set readPos to 0
             SetBytes(data);
         }
+        #endregion
 
         #region Functions
 
@@ -138,6 +140,13 @@ namespace DevelopersHub.RealtimeNetworking
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        /// <summary>Adds a ushort to the packet.</summary>
+        /// <param name="value">The ushort to add.</param>
+        public void WriteUshort(ushort value)
+        {
+            buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
         /// <summary>Adds an int to the packet.</summary>
         /// <param name="value">The int to add.</param>
         public void WriteInt(int value)
@@ -145,9 +154,23 @@ namespace DevelopersHub.RealtimeNetworking
             buffer.AddRange(BitConverter.GetBytes(value));
         }
 
+        /// <summary>Adds an uint to the packet.</summary>
+        /// <param name="value">The uint to add.</param>
+        public void WriteUint(uint value)
+        {
+            buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
         /// <summary>Adds a long to the packet.</summary>
         /// <param name="value">The long to add.</param>
         public void WriteLong(long value)
+        {
+            buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        /// <summary>Adds a ulong to the packet.</summary>
+        /// <param name="value">The ulong to add.</param>
+        public void WriteUlong(ulong value)
         {
             buffer.AddRange(BitConverter.GetBytes(value));
         }
@@ -200,6 +223,13 @@ namespace DevelopersHub.RealtimeNetworking
             WriteFloat(value.w);
         }
 
+        /// <summary>Adds a DateTime to the packet.</summary>
+        /// <param name="value">The DateTime to add.</param>
+        public void WriteDateTime(DateTime value)
+        {
+            WriteLong(value.Ticks);
+            WriteByte((byte)value.Kind);
+        }
         #endregion
 
         #region Read Data
@@ -268,6 +298,27 @@ namespace DevelopersHub.RealtimeNetworking
             }
         }
 
+        /// <summary>Reads a ushort from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public ushort ReadUshort(bool moveReadPos = true)
+        {
+            if (buffer.Count > readPos)
+            {
+                // If there are unread bytes
+                ushort value = BitConverter.ToUInt16(readableBuffer, readPos); // Convert the bytes to a ushort
+                if (moveReadPos)
+                {
+                    // If moveReadPos is true and there are unread bytes
+                    readPos += 2; // Increase readPos by 2
+                }
+                return value; // Return the ushort
+            }
+            else
+            {
+                throw new Exception("Could not read value of type 'ushort'!");
+            }
+        }
+
         /// <summary>Reads an int from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public int ReadInt(bool moveReadPos = true)
@@ -289,6 +340,27 @@ namespace DevelopersHub.RealtimeNetworking
             }
         }
 
+        /// <summary>Reads an uint from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public uint ReadUint(bool moveReadPos = true)
+        {
+            if (buffer.Count > readPos)
+            {
+                // If there are unread bytes
+                uint value = BitConverter.ToUInt32(readableBuffer, readPos); // Convert the bytes to an uint
+                if (moveReadPos)
+                {
+                    // If moveReadPos is true
+                    readPos += 4; // Increase readPos by 4
+                }
+                return value; // Return the uint
+            }
+            else
+            {
+                throw new Exception("Could not read value of type 'uint'!");
+            }
+        }
+
         /// <summary>Reads a long from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         public long ReadLong(bool moveReadPos = true)
@@ -307,6 +379,27 @@ namespace DevelopersHub.RealtimeNetworking
             else
             {
                 throw new Exception("Could not read value of type 'long'!");
+            }
+        }
+
+        /// <summary>Reads a ulong from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public ulong ReadUlong(bool moveReadPos = true)
+        {
+            if (buffer.Count > readPos)
+            {
+                // If there are unread bytes
+                ulong value = BitConverter.ToUInt64(readableBuffer, readPos); // Convert the bytes to a ulong
+                if (moveReadPos)
+                {
+                    // If moveReadPos is true
+                    readPos += 8; // Increase readPos by 8
+                }
+                return value; // Return the ulong
+            }
+            else
+            {
+                throw new Exception("Could not read value of type 'ulong'!");
             }
         }
 
@@ -338,7 +431,7 @@ namespace DevelopersHub.RealtimeNetworking
             if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                double value = BitConverter.ToSingle(readableBuffer, readPos); // Convert the bytes to a double
+                double value = BitConverter.ToDouble(readableBuffer, readPos); // Convert the bytes to a double
                 if (moveReadPos)
                 {
                     // If moveReadPos is true
@@ -408,6 +501,14 @@ namespace DevelopersHub.RealtimeNetworking
             return new Quaternion(ReadFloat(moveReadPos), ReadFloat(moveReadPos), ReadFloat(moveReadPos), ReadFloat(moveReadPos));
         }
 
+        /// <summary>Reads a DateTime from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public DateTime ReadDateTime(bool moveReadPos = true)
+        {
+            long ticks = ReadLong(moveReadPos);
+            DateTimeKind kind = (DateTimeKind)ReadByte(moveReadPos);
+            return new DateTime(ticks, kind);
+        }
         #endregion
 
         #region Compression
@@ -475,6 +576,7 @@ namespace DevelopersHub.RealtimeNetworking
 
         #endregion
 
+        #region Dispose
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -497,6 +599,7 @@ namespace DevelopersHub.RealtimeNetworking
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+        #endregion
 
     }
 }

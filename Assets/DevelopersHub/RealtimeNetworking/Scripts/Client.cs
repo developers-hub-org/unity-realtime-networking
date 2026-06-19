@@ -217,7 +217,7 @@ namespace DevelopersHub.RealtimeNetworking
                             response.WriteString(_sendToken);
                             SendPacketInternal(response, Server.ConnectionProtocol.TCP);
                         }
-                        OnConnectionAttempt.Invoke(this, true, null);
+                        OnConnectionAttempt?.Invoke(this, true, null);
                         UdpInitialize((ushort)((IPEndPoint)_tcpSocket.Client.LocalEndPoint).Port);
                         break;
                 }
